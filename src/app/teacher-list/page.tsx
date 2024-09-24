@@ -1,4 +1,5 @@
 "use client";
+import axiosInstance from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,15 +29,14 @@ const TeacherList: React.FC = () => {
     // Fetch teacher list from backend API
     const fetchTeachers = async () => {
       try {
-        const response = await fetch("http://localhost:8080/teachers"); // Replace with your actual API endpoint
-        const data = await response.json();
-        setTeachers(data);
+        const response = await axiosInstance.get("/teachers"); // Use Axios instance to get teachers
+        setTeachers(response.data); // Assuming the response data is the list of teachers
       } catch (error) {
         console.error("Error fetching teachers:", error);
       }
     };
 
-    fetchTeachers();
+    fetchTeachers(); // Call the fetch function
   }, []);
 
   const handleView = (id: number) => {

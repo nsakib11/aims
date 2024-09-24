@@ -1,4 +1,5 @@
 "use client";
+import axiosInstance from "@/lib/axiosConfig";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -66,16 +67,11 @@ const TeacherForm: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      const response = await fetch("http://localhost:8080/teachers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosInstance.post("/teachers", data); // Use Axios instance for POST request
 
-      if (response.ok) {
-        const teacher = await response.json(); // Get the created teacher data from response
+      if (response.status === 201) {
+        // Check if the response status is 201 (Created)
+        const teacher = response.data; // Get the created teacher data from response
         dispatch(setTeacherData(teacher)); // Save the teacher data to Redux
         router.push("/teacher-details"); // Redirect to the details page
       } else {
@@ -83,6 +79,7 @@ const TeacherForm: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating teacher:", error);
+      alert("An error occurred while creating the teacher.");
     }
   };
 
