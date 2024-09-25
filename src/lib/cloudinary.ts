@@ -1,9 +1,11 @@
 import axios from "axios";
 
-export const uploadImageToCloudinary = async (file: File) => {
+export const uploadImageToCloudinary = async (file: File, folder: string) => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "academicims"); // Replace with your Cloudinary upload preset
+  formData.append("upload_preset", "academicims");
+  formData.append("folder", folder);
+  // Replace with your Cloudinary upload preset
 
   try {
     const response = await axios.post(

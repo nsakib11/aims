@@ -73,7 +73,8 @@ const StudentForm: React.FC = () => {
 
       if (imageFile) {
         setUploading(true);
-        pictureUrl = await uploadImageToCloudinary(imageFile); // Upload to Cloudinary and get the URL
+        const folderName = "Students";
+        pictureUrl = await uploadImageToCloudinary(imageFile, folderName); // Upload to Cloudinary and get the URL
         setUploading(false);
       }
 
