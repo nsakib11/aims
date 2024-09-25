@@ -40,11 +40,11 @@ const TeacherList: React.FC = () => {
   }, []);
 
   const handleView = (id: number) => {
-    router.push(`/teacher-details/view/${id}`);
+    router.push(`/teacher/teacher-details/view/${id}`);
   };
 
   const handleUpdate = (id: number) => {
-    router.push(`/teacher-details/update/${id}`);
+    router.push(`/teacher/teacher-details/update/${id}`);
   };
 
   const handleDelete = async (id: number) => {

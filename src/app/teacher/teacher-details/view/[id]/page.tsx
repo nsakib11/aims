@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import axiosInstance from "../../../../lib/axiosConfig";
+import axiosInstance from "../../../../../lib/axiosConfig";
 
 interface Teacher {
   id: number;
@@ -71,7 +71,7 @@ const ViewTeacher: React.FC = () => {
           {teacher[field as keyof Teacher]}
         </p>
       ))}
-      <Link href="/teacher-list" passHref>
+      <Link href="/teacher/teacher-list" passHref>
         <button className="text-gray- w-full rounded bg-blue-500 px-4 py-2 font-bold hover:bg-blue-700">
           Back to List
         </button>

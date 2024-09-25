@@ -4,7 +4,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import axiosInstance from "../../../../lib/axiosConfig";
+import axiosInstance from "../../../../../lib/axiosConfig";
 
 interface Teacher {
   id: number;
@@ -57,7 +57,7 @@ const UpdateTeacher: React.FC = () => {
     axiosInstance
       .put(`/teachers/${id}`, data)
       .then((response) => {
-        router.push(`/teacher-details/view/${id}`); // Redirect to view page after successful update
+        router.push(`/teacher/teacher-details/view/${id}`); // Redirect to view page after successful update
       })
       .catch((err) => setError(err.message));
   };

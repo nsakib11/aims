@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import { setTeacherData } from "../app/redux/slices/teacherSlice";
+import DatePicker from "./FormElements/DatePicker/DatePickerOneTeacher";
 
 interface Teacher {
   code: string;
@@ -175,15 +176,9 @@ const TeacherForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-gray-700 mb-1 block text-sm font-medium">
-              Date of Birth
-            </label>
-            <input
-              type="date"
-              {...register("dob")}
-              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.dob && <p className="text-red-500">{errors.dob.message}</p>}
+            <label>Date of Birth</label>
+            <DatePicker register={register} name="dob" />
+            {errors.dob && <p>{errors.dob.message}</p>}
           </div>
 
           <div>
@@ -215,17 +210,9 @@ const TeacherForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-gray-700 mb-1 block text-sm font-medium">
-              Join Date
-            </label>
-            <input
-              type="date"
-              {...register("joinDate")}
-              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.joinDate && (
-              <p className="text-red-500">{errors.joinDate.message}</p>
-            )}
+            <label>Join Date</label>
+            <DatePicker register={register} name="joinDate" />
+            {errors.joinDate && <p>{errors.joinDate.message}</p>}
           </div>
 
           <div>
