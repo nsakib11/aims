@@ -1,5 +1,6 @@
 const { configureStore } = require("@reduxjs/toolkit");
 import authReducer from "./slices/authSlice";
+import organizationReducer from "./slices/organizationSlice";
 import studentReducer from "./slices/studentSlice";
 import teacherReducer from "./slices/teacherSlice";
 
@@ -7,6 +8,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     teacher: teacherReducer,
-    student: studentReducer
+    student: studentReducer,
+    organization: organizationReducer
   },
 });
