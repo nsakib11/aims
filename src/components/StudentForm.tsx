@@ -8,10 +8,10 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
-import { setTeacherData } from "../app/redux/slices/teacherSlice";
+import { setStudentData } from "../app/redux/slices/studentSlice";
 import DatePicker from "./FormElements/DatePicker/DatePickerOneTeacher";
 
-interface Teacher {
+interface Student {
   code: string;
   name: string;
   nameNative?: string;
@@ -19,13 +19,13 @@ interface Teacher {
   dob: string;
   fatherName: string;
   motherName: string;
-  joinDate: string;
+  guardianName: string;
+  birthRegistration: string;
+  enrollDate: string;
   mobile: string;
   email: string;
-  qualification: string;
-  jobType: "FULL_TIME" | "PART_TIME";
   picture?: string;
-  status: "ACTIVE" | "INACTIVE" | "TERMINATED" | "RETIRED";
+  status: "DROPOUT" | "TRANSFER" | "DIED";
 }
 
 // Validation schema
@@ -39,24 +39,21 @@ const schema = yup.object().shape({
   dob: yup.date().required("Date of Birth is required").nullable(),
   fatherName: yup.string().required("Father Name is required"),
   motherName: yup.string().required("Mother Name is required"),
-  joinDate: yup.date().required("Join Date is required").nullable(),
+  guardianName: yup.string().required("Guardian Name is required"),
+  birthRegistration: yup.string().required("Birth Registration is required"),
+  enrollDate: yup.date().required("Enroll Date is required").nullable(),
   mobile: yup
     .string()
     .required("Mobile number is required")
     .matches(/^[0-9]{10}$/, "Mobile must be 10 digits"),
   email: yup.string().email("Email is not valid").required("Email is required"),
-  qualification: yup.string().required("Qualification is required"),
-  jobType: yup
-    .string()
-    .oneOf(["FULL_TIME", "PART_TIME"])
-    .required("Job Type is required"),
   status: yup
     .string()
-    .oneOf(["ACTIVE", "INACTIVE", "TERMINATED", "RETIRED"])
+    .oneOf(["DROPOUT", "TRANSFER", "DIED"])
     .required("Status is required"),
 });
 
-const TeacherForm: React.FC = () => {
+const StudentForm: React.FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -66,11 +63,11 @@ const TeacherForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Teacher>({
+  } = useForm<Student>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data: Teacher) => {
+  const onSubmit = async (data: Student) => {
     try {
       let pictureUrl = "";
 
@@ -80,24 +77,28 @@ const TeacherForm: React.FC = () => {
         setUploading(false);
       }
 
-      const teacherData = {
+      const studentData = {
         ...data,
         picture: pictureUrl || undefined, // Add the picture URL to the data
       };
 
-      const response = await axiosInstance.post("/teachers", teacherData);
+      const response = await axiosInstance.post("/students", studentData);
 
-      if (response.status === 201) {
-        const teacher = response.data;
-        dispatch(setTeacherData(teacher));
-        router.push("/teacher/teacher-details");
+      // Log the response to debug
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
+      if (response.status === 200) {
+        const student = response.data;
+        dispatch(setStudentData(student)); // Save student data to Redux
+        router.push("/student/student-details"); // Redirect to student list
       } else {
-        alert("Failed to create teacher");
+        alert(`Failed to create student. Status: ${response.status}`);
       }
     } catch (error) {
       setUploading(false);
-      console.error("Error creating teacher:", error);
-      alert("An error occurred while creating the teacher.");
+      console.error("Error creating student:", error);
+      alert("An error occurred while creating the student.");
     }
   };
 
@@ -114,7 +115,7 @@ const TeacherForm: React.FC = () => {
         className="mx-auto max-w-4xl space-y-6 rounded bg-white p-8 shadow-lg"
       >
         <h2 className="mb-4 text-center text-xl font-semibold">
-          Create Teacher
+          Create Student
         </h2>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -210,9 +211,37 @@ const TeacherForm: React.FC = () => {
           </div>
 
           <div>
-            <label>Join Date</label>
-            <DatePicker register={register} name="joinDate" />
-            {errors.joinDate && <p>{errors.joinDate.message}</p>}
+            <label className="text-gray-700 mb-1 block text-sm font-medium">
+              Guardian Name
+            </label>
+            <input
+              type="text"
+              {...register("guardianName")}
+              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.guardianName && (
+              <p className="text-red-500">{errors.guardianName.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-gray-700 mb-1 block text-sm font-medium">
+              Birth Registration
+            </label>
+            <input
+              type="text"
+              {...register("birthRegistration")}
+              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.birthRegistration && (
+              <p className="text-red-500">{errors.birthRegistration.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label>Enroll Date</label>
+            <DatePicker register={register} name="enrollDate" />
+            {errors.enrollDate && <p>{errors.enrollDate.message}</p>}
           </div>
 
           <div>
@@ -244,37 +273,6 @@ const TeacherForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-gray-700 mb-1 block text-sm font-medium">
-              Qualification
-            </label>
-            <input
-              type="text"
-              {...register("qualification")}
-              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.qualification && (
-              <p className="text-red-500">{errors.qualification.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="text-gray-700 mb-1 block text-sm font-medium">
-              Job Type
-            </label>
-            <select
-              {...register("jobType")}
-              className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Job Type</option>
-              <option value="FULL_TIME">Full Time</option>
-              <option value="PART_TIME">Part Time</option>
-            </select>
-            {errors.jobType && (
-              <p className="text-red-500">{errors.jobType.message}</p>
-            )}
-          </div>
-
-          <div>
             <label className="mb-1 block">Picture</label>
             <input
               type="file"
@@ -294,10 +292,9 @@ const TeacherForm: React.FC = () => {
               className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-              <option value="TERMINATED">Terminated</option>
-              <option value="RETIRED">Retired</option>
+              <option value="DROPOUT">Dropout</option>
+              <option value="TRANSFER">Transfer</option>
+              <option value="DIED">Died</option>
             </select>
             {errors.status && (
               <p className="text-red-500">{errors.status.message}</p>
@@ -305,15 +302,17 @@ const TeacherForm: React.FC = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="mt-4 w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-500"
-        >
-          Submit
-        </button>
+        <div className="mt-4 text-right">
+          <button
+            type="submit"
+            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default TeacherForm;
+export default StudentForm;

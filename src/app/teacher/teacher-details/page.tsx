@@ -15,7 +15,7 @@ const TeacherDetails: React.FC = () => {
   const formattedJoinDate = new Date(teacherData.joinDate).toLocaleDateString();
 
   const handleViewAllTeachers = () => {
-    router.push("/teacher-list"); // Assuming '/teachers' is the route where the teacher list is displayed
+    router.push("/teacher/teacher-list"); // Assuming '/teachers' is the route where the teacher list is displayed
   };
 
   return (
