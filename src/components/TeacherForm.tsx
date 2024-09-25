@@ -1,8 +1,10 @@
 "use client";
+
 import axiosInstance from "@/lib/axiosConfig";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
@@ -56,6 +58,8 @@ const schema = yup.object().shape({
 const TeacherForm: React.FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const {
     register,
@@ -67,19 +71,38 @@ const TeacherForm: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      const response = await axiosInstance.post("/teachers", data); // Use Axios instance for POST request
+      let pictureUrl = "";
+
+      if (imageFile) {
+        setUploading(true);
+        pictureUrl = await uploadImageToCloudinary(imageFile); // Upload to Cloudinary and get the URL
+        setUploading(false);
+      }
+
+      const teacherData = {
+        ...data,
+        picture: pictureUrl || undefined, // Add the picture URL to the data
+      };
+
+      const response = await axiosInstance.post("/teachers", teacherData);
 
       if (response.status === 201) {
-        // Check if the response status is 201 (Created)
-        const teacher = response.data; // Get the created teacher data from response
-        dispatch(setTeacherData(teacher)); // Save the teacher data to Redux
-        router.push("/teacher-details"); // Redirect to the details page
+        const teacher = response.data;
+        dispatch(setTeacherData(teacher));
+        router.push("/teacher-details");
       } else {
         alert("Failed to create teacher");
       }
     } catch (error) {
+      setUploading(false);
       console.error("Error creating teacher:", error);
       alert("An error occurred while creating the teacher.");
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
     }
   };
 
@@ -267,10 +290,12 @@ const TeacherForm: React.FC = () => {
           <div>
             <label className="mb-1 block">Picture</label>
             <input
-              type="text"
-              {...register("picture")}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
               className="w-full border p-2"
             />
+            {uploading && <p className="text-blue-500">Uploading...</p>}
           </div>
 
           <div>
